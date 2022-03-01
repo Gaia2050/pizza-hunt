@@ -1,7 +1,3 @@
-const { response } = require("express");
-const res = require("express/lib/response");
-const { json } = require("express/lib/response");
-
 const $backBtn = document.querySelector('#back-btn');
 const $pizzaName = document.querySelector('#pizza-name');
 const $createdBy = document.querySelector('#created-by');
@@ -14,17 +10,27 @@ const $newCommentForm = document.querySelector('#new-comment-form');
 let pizzaId;
 
 function getPizza() {
-  //get id of pizza 
+  // get id of pizza
   const searchParams = new URLSearchParams(document.location.search.substring(1));
   const pizzaId = searchParams.get('id');
 
-  //get pizza information 
+  // get pizzaInfo
   fetch(`/api/pizzas/${pizzaId}`)
-  .then(response => {
-    console.log(response);
-    return response.json();
-  })
-  .then(printPizza);
+    .then(response => {
+      console.log(response);
+      if (!response.ok) {
+        console.log('hi');
+        throw new Error({ message: 'Something went wrong!' });
+      }
+
+      return response.json();
+    })
+    .then(printPizza)
+    .catch(err => {
+      console.log(err);
+      alert('Cannot find a pizza with this id! Taking you back.');
+      window.history.back();
+    });
 }
 
 function printPizza(pizzaData) {
@@ -106,51 +112,28 @@ function handleNewCommentSubmit(event) {
 
   const formData = { commentBody, writtenBy };
 
-  fetch(`.api/comments/${pizzaId}`, {
-    method: 'Post',
+  fetch(`/api/comments/${pizzaId}`, {
+    method: 'POST',
     headers: {
       Accept: 'application/json',
-      "Content-Type": 'application/json'
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(formData)
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Something went wrong')
-    }
-    response.json();
-  })
-  .then(commentResponse => {
-    console.log(commentResponse);
-    locationReload();
-  })
-  .catch(err => {
-    console.log(err);
-  });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      response.json();
+    })
+    .then(commentResponse => {
+      console.log(commentResponse);
+      // location.reload();
+    })
+    .catch(err => {
+      console.log(err);
+    });
 }
-
-// function handleNewReplySubmit(event) {
-//   event.preventDefault();
-
-//   if (!event.target.matches('.reply-form')) {
-//     return false;
-//   }
-
-//   const commentId = event.target.getAttribute('data-commentId');
-
-//   const writtenBy = event.target.querySelector('[name=reply-name]').value;
-//   const replyBody = event.target.querySelector('[name=reply]').value;
-
-//   if (!replyBody || !writtenBy) {
-//     return false;
-//   }
-
-  // const formData = { writtenBy, replyBody };
-// }
-
-// $backBtn.addEventListener('click', function() {
-  // window.history.back();
-// });
 
 function handleNewReplySubmit(event) {
   event.preventDefault();
@@ -199,3 +182,5 @@ $backBtn.addEventListener('click', function() {
 
 $newCommentForm.addEventListener('submit', handleNewCommentSubmit);
 $commentSection.addEventListener('submit', handleNewReplySubmit);
+
+getPizza();

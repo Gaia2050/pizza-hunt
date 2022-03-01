@@ -1,32 +1,4 @@
-// const router = require('express').Router();
-// // const { addComment, removeComment } = require('../../controllers/comment-controller');
-// // const commentRoutes = require('./commentRoutes');
-// // const pizzaRoutes = require('./pizza-routes');
-// const {
-//     addComment,
-//     removeComment,
-//     addReply,
-//     removeReply
-// } = require('../../controllers/comment-controller');
-
-// // router.use('/comments', commentRoutes);
-// // router.use('pizzas', pizzaRoutes);
-
-// // /api/comments/<pizzaId>
-// router.route('/:pizzaId').post(addComment);
-// router.route(':pizzaId/:commentId/:replyId').delete(removeReply);
-// // /api/comments/<pizzaId>/<comments>
-// router
-//     .route('/:pizzaId/:commentId')
-//     .put(addReply)
-//     .delete(removeComment)
-
-
-
-// module.exports = router;
-
 const router = require('express').Router();
-
 const {
     addComment,
     removeComment,
@@ -34,20 +6,16 @@ const {
     removeReply
 } = require('../../controllers/comment-controller');
 
-
-
 // /api/comments/<pizzaId>
 router.route('/:pizzaId').post(addComment);
 
-router
-.route(':pizzaId/:commentId/:replyId')
-.delete(removeReply);
-// /api/comments/<pizzaId>/<comments>
+// /api/comments/<pizzaId>/<commentId>
 router
     .route('/:pizzaId/:commentId')
     .put(addReply)
-    .delete(removeComment)
+    .delete(removeComment);
 
-
+// /api/comments/<pizzaId>/<commentId>/<replyId>
+router.route('/:pizzaId/:commentId/:replyId').delete(removeReply);
 
 module.exports = router;
